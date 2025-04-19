@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 
 
-
 function App() {
   const [exercises, setExercises] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,26 +32,6 @@ function App() {
     fetchExercises();
   }, []);
 
-  {exercises.map((exercise) => {
-    console.log(exercise.translations);
-    const englishTranslation = exercise.translations.find(
-      (translation) => translation.language === 2
-    );
-    return (
-      <div key={exercise.id} className="exercise-item">
-        <h3>{englishTranslation.name}</h3>
-        <p>{englishTranslation.description || 'Sem descrição disponível.'}</p>
-        {exercise.images.length > 0 && (
-          <img
-            src={exercise.images[0].image}
-            alt={englishTranslation.name}
-            className="exercise-image"
-          />
-        )}
-      </div>
-    );
-  })}
-
   return (
     <div className="App">
       <header className="App-header">
@@ -63,19 +42,29 @@ function App() {
           <p>Carregando...</p>
         ) : (
           <div className="exercise-list">
-            {exercises.map((exercise) => (
-              <div key={exercise.id} className="exercise-item">
-                <h3>{exercise.translations[0].name}</h3>
-                <p>{exercise.translations[0].description || 'Sem descrição disponível.'}</p>
-                {exercise.images.length > 0 && (
-                  <img
-                    src={exercise.images[0].image}
-                    alt={exercise.name}
-                    className="exercise-image"
-                  />
-                )}
-              </div>
-            ))}
+            {exercises.map((exercise) => {
+              const portugueseTranslation = exercise.translations.find(
+                (translation) => translation.language === 2
+              );
+  
+              const name = portugueseTranslation?.name || 'Nome não disponível';
+              const description =
+                portugueseTranslation?.description || 'Descrição não disponível';
+  
+              return (
+                <div key={exercise.id} className="exercise-item">
+                  <h3>{name}</h3>
+                  <p>{description}</p>
+                  {exercise.images.length > 0 && (
+                    <img
+                      src={exercise.images[0].image}
+                      alt={name}
+                      className="exercise-image"
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </main>
