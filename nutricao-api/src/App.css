@@ -30,3 +30,81 @@
   border-radius: 8px;
 }
 
+.step-tracker {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.tracker-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.circular-progress {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: conic-gradient(#4caf50 50%, #d3d3d3 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #333;
+  font-family: Arial, sans-serif;
+}
+
+.step-count {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.step-label {
+  font-size: 12px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.action-button {
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.action-button:hover {
+  background-color: #45a049;
+}
+
+.customize-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.customize-button {
+  padding: 10px 20px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.customize-button:hover {
+  background-color: #1976d2;
+}
+
