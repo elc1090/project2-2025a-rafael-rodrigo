@@ -14,23 +14,23 @@ function App() {
           path="/"
           element={
             <div className="home-page">
-              <h1>Bem-vindo à Aplicação</h1>
+              <img src="/images/logo.png" alt="Home" className="home-logo" />
               <div className="icon-container">
                 <Link to="/exercises" className="icon-link">
                   <img
                     src="/icons/exercise-icon.png"
-                    alt="Exercícios"
+                    alt="Exercises"
                     className="icon"
                   />
-                  <p>Exercícios</p>
+                  <p>Exercises</p>
                 </Link>
                 <Link to="/nutrition" className="icon-link">
                   <img
                     src="/icons/nutrition-icon.png"
-                    alt="Nutrição"
+                    alt="Nutrition"
                     className="icon"
                   />
-                  <p>Nutrição</p>
+                  <p>Nutrition</p>
                 </Link>
               </div>
             </div>

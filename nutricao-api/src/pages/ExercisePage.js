@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '../App.css'; // Certifique-se de ajustar o caminho para o CSS, se necessário.
+import '../App.css'; 
 
 function ExercisePage() {
   const [exercises, setExercises] = useState([]);
@@ -22,7 +22,7 @@ function ExercisePage() {
         );
         setExercises(filteredExercises);
       } catch (error) {
-        console.error('Erro ao buscar os exercícios:', error);
+        console.error('Error searching for exercises', error);
       } finally {
         setLoading(false);
       }
@@ -39,24 +39,34 @@ function ExercisePage() {
       ) : (
         <div className="exercise-list">
           {exercises.map((exercise) => {
-            const portugueseTranslation = exercise.translations.find(
+            const englishTranslation = exercise.translations.find(
               (translation) => translation.language === 2
             );
 
-            const name = portugueseTranslation?.name || 'Nome não disponível';
+            const name = englishTranslation?.name || 'Name not available';
             const description =
-              portugueseTranslation?.description || 'Descrição não disponível';
+              englishTranslation?.description || 'Description not available';
 
             return (
               <div key={exercise.id} className="exercise-item">
                 <h3>{name}</h3>
                 <p>{description}</p>
-                {exercise.images.length > 0 && (
+                {exercise.images.length > 0 ? (
                   <img
                     src={exercise.images[0].image}
                     alt={name}
                     className="exercise-image"
                   />
+                ) : (
+                  // Exibe o ícone SVG se não houver imagens
+                  <svg
+                    className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1p9wzm4 exercise-placeholder"
+                    focusable="false"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2M8.5 13.5l2.5 3.01L14.5 12l4.5 6H5z"></path>
+                  </svg>
                 )}
               </div>
             );
