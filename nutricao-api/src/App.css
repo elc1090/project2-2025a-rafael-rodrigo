@@ -14,6 +14,7 @@
   justify-content: center;
   gap: 20px;
   padding: 20px;
+  align-items: stretch; /* Garante que todos os itens tenham a mesma altura */
 }
 
 .exercise-item {
@@ -21,13 +22,31 @@
   border-radius: 8px;
   padding: 10px;
   max-width: 300px;
-  text-align: left;
+  text-align: center; /* Centraliza o texto */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centraliza o conteúdo horizontalmente */
+  height: 400px; /* Define uma altura fixa para os itens */
+  justify-content: space-between; /* Distribui o conteúdo verticalmente */
+  box-sizing: border-box; /* Inclui padding e borda no cálculo do tamanho */
+  overflow: hidden; /* Impede que o conteúdo vaze para fora do card */
+  word-wrap: break-word; /* Quebra palavras longas para evitar vazamento */
 }
 
 .exercise-image {
   width: 100%;
-  height: auto;
+  height: 200px; /* Define uma altura fixa para as imagens */
   border-radius: 8px;
+  object-fit: cover; /* Ajusta a imagem para caber no espaço sem distorção */
+}
+
+.exercise-item p {
+  max-height: 100px; /* Limita a altura do texto descritivo */
+  overflow: hidden; /* Esconde o texto que ultrapassar o limite */
+  text-overflow: ellipsis; /* Adiciona reticências ao texto cortado */
+  display: -webkit-box; /* Define um contêiner flexível para múltiplas linhas */
+  -webkit-line-clamp: 3; /* Limita o texto a 3 linhas */
+  -webkit-box-orient: vertical; /* Define a orientação do contêiner */
 }
 
 .step-tracker {

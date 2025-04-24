@@ -44,13 +44,12 @@ function ExercisePage() {
             );
 
             const name = englishTranslation?.name || 'Name not available';
-            const description =
-              englishTranslation?.description || 'Description not available';
+            const categories = exercise.category.name;
 
             return (
               <div key={exercise.id} className="exercise-item">
                 <h3>{name}</h3>
-                <p>{description}</p>
+                <p>{categories}</p>
                 {exercise.images.length > 0 ? (
                   <img
                     src={exercise.images[0].image}
