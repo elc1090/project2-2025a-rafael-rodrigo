@@ -1,0 +1,47 @@
+.customize-page {
+  text-align: center;
+  padding: 20px;
+}
+
+.profile-photo-section {
+  margin-bottom: 20px;
+}
+
+.profile-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid #4caf50;
+}
+
+.goal-section {
+  margin: 20px 0;
+}
+
+.goal-section label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.goal-section input {
+  margin-left: 10px;
+  padding: 5px;
+  font-size: 14px;
+}
+
+.save-button {
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.save-button:hover {
+  background-color: #45a049;
+}
