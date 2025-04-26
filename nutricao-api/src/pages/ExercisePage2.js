@@ -39,6 +39,7 @@ function ExercisePage2() {
     const [languageFilter, setLanguageFilter] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("");
     const [categories, setCategories] = useState([]);
+    const [nextExercisesLink, setNextExercisesLink] = useState(null);
 
     useEffect(() =>{
         async function fetchExercises() {
@@ -54,6 +55,7 @@ function ExercisePage2() {
                 });
                 let data = await response.json();
                 setExercises(data.results);
+                setNextExercisesLink(data.next);
 
                 // procura as categorias
                 response = await fetch(apiCategoryUrl, {
@@ -78,12 +80,12 @@ function ExercisePage2() {
     }, []);
 
     let effectiveExercises = exercises.filter((exercise) => {
-        console.log(`Exercicio ${exercise.id}: category: ${exercise.category}, language: ${exercise.translations}. CurrentFilter: ${categoryFilter}`);
         return categoryFilter ? exercise.category.name === categoryFilter : true;
     });
     effectiveExercises = effectiveExercises.filter((exercise) => {
         return languageFilter ? exercise.translations.some((translation) => translation.language === parseInt(languageFilter)) : true;
     });
+    console.log("Effective exercises: ", effectiveExercises);
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -137,27 +139,38 @@ function ExercisePage2() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', padding: '16px' }}>
-                {effectiveExercises.map((exercise) => {
+                {
+                effectiveExercises.map((exercise) => {
                     const englishTranslation = exercise.translations.find(
                         (translation) => translation.language === 2
                     );
                     const name = englishTranslation?.name || 'Name not available';
                     const categories = exercise.category.name || 'Category not available';
                     const image = exercise.images.length > 0 ? exercise.images[0].image : imageNotFoundImage;
-                    
-                    (
-                    <div key={name} style={{ border: '1px solid #ccc', borderRadius: '8px', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '320px', textAlign: 'center' }}>
-                        <img
-                            src={image}
-                            alt={name}
-                            style={{ width: '100%', height: '160px', objectFit: 'cover' }}
-                        />
+
+                    return (
+                        <div key={name} style={{ border: '1px solid #ccc', borderRadius: '8px', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '320px', textAlign: 'center' }}>
+                            {
+                                exercise.images.length > 0 ? (
+                                    <img
+                                        src={image}
+                                        alt={name}
+                                        style={{ width: '100%', height: '160px', objectFit: 'contain' }}
+                                    />
+                                ) : (
+                                    <div style={{ width: '50%', height: '160px', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto' }}>
+                                        {image}
+                                    </div>
+                                )
+                            }
                         <div style={{ padding: '16px', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                             <h3 style={{ fontSize: '20px', margin: '8px 0' }}>{name}</h3>
                             <p style={{ fontSize: '14px', color: '#777' }}>{categories}</p>
                         </div>
                     </div>
-                )})}
+                    );
+                })
+                }
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', padding: '24px' }}>
