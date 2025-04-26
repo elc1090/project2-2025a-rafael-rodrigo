@@ -174,8 +174,31 @@ function ExercisePage2() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', padding: '24px' }}>
-                <button style={{ padding: '8px 16px', border: '1px solid #ccc', borderRadius: '4px', background: 'white', cursor: 'pointer' }}>Anterior</button>
-                <button style={{ padding: '8px 16px', border: '1px solid #ccc', borderRadius: '4px', background: '#007bff', color: 'white', cursor: 'pointer' }}>Próxima</button>
+                <button style={{ padding: '8px 16px', border: '1px solid #ccc', borderRadius: '4px', background: '#007bff', color: 'white', cursor: 'pointer' }}
+                onClick={() => {
+                    async function loadMore() {
+                        const apiKey = process.env.REACT_APP_API_KEY;
+                        try{
+                            const response = await fetch(nextExercisesLink, {
+                                headers: {
+                                    Authorization: `Token ${apiKey}`,
+                                },
+                            });
+                            const data = await response.json();
+                            const newEx = exercises.concat(data.results);
+                            setExercises(newEx);
+                            setNextExercisesLink(data.next);
+                        }catch(error){
+
+                        }finally{
+
+                        }
+                    }
+
+                    setLoading(true);
+                    loadMore();
+                    setLoading(false);
+                }}>Carregar mais</button>
             </div>
         </div>
     );
