@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import './App.css';
-import ExercisePage from './pages/ExercisePage';
 import ExercisePage2 from './pages/ExercisePage2';
 import NutritionPage from './pages/NutritionPage';
 import CustomizePage from './pages/CustomizePage';
