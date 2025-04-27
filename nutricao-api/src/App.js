@@ -108,12 +108,6 @@ function App() {
                     path="/exercises"
                     element={
                         <div className="exercise-page">
-                            <div className="page-header">
-                                <Link to="/" className="back-button">
-                                    <i className="icon">←</i>
-                                </Link>
-                                <h2>Exercises</h2>
-                            </div>
                             <ExercisePage2 />
                         </div>
                     }
@@ -124,12 +118,6 @@ function App() {
                     path="/nutrition" 
                     element={
                         <div className="nutrition-page">
-                            <div className="page-header">
-                                <Link to="/" className="back-button">
-                                    <i className="icon">←</i>
-                                </Link>
-                                <h2>Nutrition</h2>
-                            </div>
                             <NutritionPage />
                         </div>
                     } 
@@ -156,12 +144,6 @@ function App() {
                     path="/favorites" 
                     element={
                         <div className="favorites-page">
-                            <div className="page-header">
-                                <Link to="/" className="back-button">
-                                    <i className="icon">←</i>
-                                </Link>
-                                <h2>Favorites</h2>
-                            </div>
                             <FavoritesPage />
                         </div>
                     } 

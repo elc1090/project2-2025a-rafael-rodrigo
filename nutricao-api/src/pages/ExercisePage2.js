@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import ExerciseCard from "./ExerciseCard";
+import './ExercisePage2.css';
 
 function ExercisePage2() {
     const [exercises, setExercises] = useState([]);
@@ -8,32 +9,52 @@ function ExercisePage2() {
     const [categoryFilter, setCategoryFilter] = useState("");
     const [equipmentFilter, setEquipmentFilter] = useState("");
     const [categories, setCategories] = useState([]);
+    const [equipmentOptions, setEquipmentOptions] = useState([]);
     const [nextExercisesLink, setNextExercisesLink] = useState('https://wger.de/api/v2/exerciseinfo/');
     const [favorites, setFavorites] = useState([]);
-
-    const equipmentOptions = [
-        "Barbell", "Bench", "Dumbbell", "Gym mat", "Incline bench",
-        "Kettlebell", "Pull up bar", "SZ bar", "Swiss ball", "none"
-    ];
+    const [activeFilters, setActiveFilters] = useState(false);
 
     useEffect(() => {
-        // Load favorites from localStorage on initial render
         const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
         setFavorites(storedFavorites);
     }, []);
 
-    const fetchExercises = async (initialLoad = false) => {
-        if (!nextExercisesLink || loading) return; // Stop if no more pages or already loading
+    useEffect(() => {
+        const fetchEquipment = async () => {
+            const apiEquipmentUrl = 'https://wger.de/api/v2/equipment/';
+            const apiKey = process.env.REACT_APP_API_KEY;
+
+            try {
+                const response = await fetch(apiEquipmentUrl, {
+                    headers: {
+                        Authorization: `Token ${apiKey}`,
+                    },
+                });
+                const data = await response.json();
+                setEquipmentOptions(data.results.map((equipment) => equipment.name));
+            } catch (error) {
+                console.error('Error fetching equipment:', error);
+            }
+        };
+
+        fetchEquipment();
+    }, []);
+
+    const fetchExercises = async (initialLoad = false, reset = false, minExercises = 0) => {
+        if ((!nextExercisesLink && !reset) || loading) return;
         setLoading(true);
         const apiCategoryUrl = 'https://wger.de/api/v2/exercisecategory/';
         const apiKey = process.env.REACT_APP_API_KEY;
 
         try {
             let loadedCount = 0;
-            let currentLink = nextExercisesLink;
+            let currentLink = reset ? 'https://wger.de/api/v2/exerciseinfo/' : nextExercisesLink;
             const newExercises = [];
+            let nextLink = null;
 
-            while (initialLoad && loadedCount < 20 && currentLink) {
+            while ((initialLoad && loadedCount < 20) || (minExercises > 0 && loadedCount < minExercises)) {
+                if (!currentLink) break;
+                
                 const response = await fetch(currentLink, {
                     headers: {
                         Authorization: `Token ${apiKey}`,
@@ -42,24 +63,13 @@ function ExercisePage2() {
                 const data = await response.json();
                 newExercises.push(...data.results);
                 currentLink = data.next;
+                nextLink = data.next;
                 loadedCount += data.results.length;
             }
 
-            if (!initialLoad) {
-                const response = await fetch(nextExercisesLink, {
-                    headers: {
-                        Authorization: `Token ${apiKey}`,
-                    },
-                });
-                const data = await response.json();
-                newExercises.push(...data.results);
-                currentLink = data.next;
-            }
+            setExercises(reset ? newExercises : (prev) => [...prev, ...newExercises]);
+            setNextExercisesLink(nextLink);
 
-            setExercises((prev) => [...prev, ...newExercises]);
-            setNextExercisesLink(currentLink);
-
-            // Fetch categories only once
             if (categories.length === 0) {
                 const categoryResponse = await fetch(apiCategoryUrl, {
                     headers: {
@@ -77,96 +87,141 @@ function ExercisePage2() {
     };
 
     useEffect(() => {
-        // Load at least 20 exercises on initial render
         fetchExercises(true);
     }, []);
 
     useEffect(() => {
         const handleScroll = () => {
             if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 100 && !loading) {
-                fetchExercises();
+                if (activeFilters) {
+                    fetchExercises(false, false, 5); // Load at least 5 exercises when filtered
+                } else {
+                    fetchExercises();
+                }
             }
         };
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [loading, nextExercisesLink]);
+    }, [loading, nextExercisesLink, activeFilters]);
 
-    const toggleFavorite = (exerciseId) => {
-        const updatedFavorites = favorites.includes(exerciseId)
-            ? favorites.filter(id => id !== exerciseId)
-            : [...favorites, exerciseId];
-        setFavorites(updatedFavorites);
-        localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+    const handleFilterChange = (filterType, value) => {
+        if (filterType === "language") setLanguageFilter(value);
+        if (filterType === "category") setCategoryFilter(value);
+        if (filterType === "equipment") setEquipmentFilter(value);
+
+        const hasFilters = value || 
+            (filterType === "language" ? categoryFilter || equipmentFilter : 
+             filterType === "category" ? languageFilter || equipmentFilter : 
+             languageFilter || categoryFilter);
+        
+        setActiveFilters(!!hasFilters);
+        
+        setExercises([]);
+        setNextExercisesLink('https://wger.de/api/v2/exerciseinfo/');
+        fetchExercises(false, true, hasFilters ? 10 : 0); // Load at least 10 exercises when filtered
     };
 
-    let effectiveExercises = exercises.filter((exercise) => {
-        return categoryFilter ? exercise.category.name === categoryFilter : true;
-    });
-    effectiveExercises = effectiveExercises.filter((exercise) => {
-        return languageFilter ? exercise.translations.some((translation) => translation.language === parseInt(languageFilter)) : true;
-    });
-    effectiveExercises = effectiveExercises.filter((exercise) => {
-        return equipmentFilter ? exercise.equipment.some((eq) => eq.name === equipmentFilter) : true;
+    const filteredExercises = exercises.filter((exercise) => {
+        const categoryMatch = categoryFilter ? exercise.category.name === categoryFilter : true;
+        const languageMatch = languageFilter ? exercise.translations.some((translation) => translation.language === parseInt(languageFilter)) : true;
+        const equipmentMatch = equipmentFilter ? exercise.equipment.some((eq) => eq.name === equipmentFilter) : true;
+        return categoryMatch && languageMatch && equipmentMatch;
     });
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ backgroundColor: '#ccc', padding: '24px 0', textAlign: 'center', fontSize: '24px', fontWeight: 'bold' }}>
-                Exercícios
+        <div className="exercise-page-container">
+            <div className="exercise-page-header">
+                <h1>Exercises</h1>
+                <p>Find the perfect workout for your goals</p>
             </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', padding: '16px', justifyContent: 'center' }}>
-                <select
-                    style={{ border: '1px solid #ccc', padding: '8px', borderRadius: '4px' }}
-                    value={languageFilter}
-                    onChange={(e) => setLanguageFilter(e.target.value)}
-                >
-                    <option value="">Todas as Línguas</option>
-                    <option value="1">Alemão</option>
-                    <option value="2">Inglês</option>
-                </select>
+            <div className="filters-container">
+                <div className="filter-select">
+                    <label htmlFor="language-filter">Language</label>
+                    <select
+                        id="language-filter"
+                        value={languageFilter}
+                        onChange={(e) => handleFilterChange("language", e.target.value)}
+                    >
+                        <option value="">All Languages</option>
+                        <option value="1">German</option>
+                        <option value="2">English</option>
+                    </select>
+                </div>
 
-                <select
-                    style={{ border: '1px solid #ccc', padding: '8px', borderRadius: '4px' }}
-                    value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value)}
-                >
-                    <option value="">Todas as Categorias</option>
-                    {categories.map((category) => (
-                        <option key={category} value={category}>{category}</option>
+                <div className="filter-select">
+                    <label htmlFor="category-filter">Category</label>
+                    <select
+                        id="category-filter"
+                        value={categoryFilter}
+                        onChange={(e) => handleFilterChange("category", e.target.value)}
+                    >
+                        <option value="">All Categories</option>
+                        {categories.map((category) => (
+                            <option key={category} value={category}>{category}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="filter-select">
+                    <label htmlFor="equipment-filter">Equipment</label>
+                    <select
+                        id="equipment-filter"
+                        value={equipmentFilter}
+                        onChange={(e) => handleFilterChange("equipment", e.target.value)}
+                    >
+                        <option value="">All Equipment</option>
+                        {equipmentOptions.map((equipment) => (
+                            <option key={equipment} value={equipment}>{equipment}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            {filteredExercises.length === 0 && !loading ? (
+                <div className="no-results">
+                    <p>No exercises found matching your filters</p>
+                    <button 
+                        className="clear-filters-button"
+                        onClick={() => {
+                            setLanguageFilter("");
+                            setCategoryFilter("");
+                            setEquipmentFilter("");
+                            setActiveFilters(false);
+                            setExercises([]);
+                            setNextExercisesLink('https://wger.de/api/v2/exerciseinfo/');
+                            fetchExercises(true);
+                        }}
+                    >
+                        Clear Filters
+                    </button>
+                </div>
+            ) : (
+                <div className="exercises-grid">
+                    {filteredExercises.map((exercise) => (
+                        <ExerciseCard
+                            key={exercise.id}
+                            exercise={exercise}
+                            onFavoriteToggle={(id) => {
+                                const updatedFavorites = favorites.includes(id)
+                                    ? favorites.filter((favId) => favId !== id)
+                                    : [...favorites, id];
+                                setFavorites(updatedFavorites);
+                                localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+                            }}
+                            isFavorite={favorites.includes(exercise.id)}
+                        />
                     ))}
-                </select>
-
-                <select
-                    style={{ border: '1px solid #ccc', padding: '8px', borderRadius: '4px' }}
-                    value={equipmentFilter}
-                    onChange={(e) => setEquipmentFilter(e.target.value)}
-                >
-                    <option value="">Todos os Equipamentos</option>
-                    {equipmentOptions.map((equipment) => (
-                        <option key={equipment} value={equipment}>{equipment}</option>
+                    {loading && Array.from({ length: activeFilters ? 5 : 3 }).map((_, index) => (
+                        <div key={`loading-${index}`} className="exercise-card loading-placeholder">
+                            <div className="loading-bar title-bar"></div>
+                            <div className="loading-bar description-bar"></div>
+                            <div className="loading-bar description-bar"></div>
+                        </div>
                     ))}
-                </select>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', padding: '16px' }}>
-                {effectiveExercises.map((exercise) => (
-                    <ExerciseCard
-                        key={exercise.id}
-                        exercise={exercise}
-                        onFavoriteToggle={toggleFavorite}
-                        isFavorite={favorites.includes(exercise.id)}
-                    />
-                ))}
-                {loading && Array.from({ length: 3 }).map((_, index) => (
-                    <div key={index} className="exercise-card loading-placeholder">
-                        <div className="loading-bar title-bar"></div>
-                        <div className="loading-bar description-bar"></div>
-                        <div className="loading-bar description-bar"></div>
-                    </div>
-                ))}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
