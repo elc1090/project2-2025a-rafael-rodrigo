@@ -1,35 +1,28 @@
-// filepath: c:\Users\naoca\Documents\GitHub\project2-2025a-rafael-rodrigo\nutricao-api\src\App.js
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import ExercisePage from './pages/ExercisePage';
-import ExercisePage2 from './pages/ExercisePage2'; // Ensure ExercisePage2 supports infinite scrolling
+import ExercisePage2 from './pages/ExercisePage2';
 import NutritionPage from './pages/NutritionPage';
-import CustomizePage from './pages/CustomizePage'; // Import da nova página
-import ExerciseCard from './pages/ExerciseCard';
+import CustomizePage from './pages/CustomizePage';
+import FavoritesPage from './pages/FavoritesPage';
 
 function App() {
     const [metrics, setMetrics] = useState({
         steps: 0,
         calories: 0,
         activeTime: 0,
+        heartRate: 72,
+        sleep: 7.5,
     });
 
     const goals = {
         steps: 10000,
         calories: 2000,
         activeTime: 60, // in minutes
+        heartRate: 60,
+        sleep: 8, // in hours
     };
-
-    const [favorites, setFavorites] = useState([]);
-    const [favoriteExercises, setFavoriteExercises] = useState([]);
-    const [favoriteLoading, setFavoriteLoading] = useState(true);
-
-    useEffect(() => {
-        // Carrega os favoritos do localStorage na primeira renderização
-        const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        setFavorites(storedFavorites);
-    }, []);
 
     useEffect(() => {
         // Generate random values for simulation
@@ -37,115 +30,142 @@ function App() {
             steps: Math.floor(Math.random() * goals.steps),
             calories: Math.floor(Math.random() * goals.calories),
             activeTime: Math.floor(Math.random() * goals.activeTime),
+            heartRate: Math.floor(Math.random() * 40) + 60,
+            sleep: (Math.random() * 3 + 5).toFixed(1),
         };
         setMetrics(randomMetrics);
     }, []);
-
-    useEffect(() => {
-        async function fetchExercise(id) {
-            const apiUrl = 'https://wger.de/api/v2/exerciseinfo/' + id + '/';
-            const apiKey = process.env.REACT_APP_API_KEY;
-
-            try{
-                let response = await fetch(apiUrl, {
-                    headers: {
-                        Authorization: `Token ${apiKey}`,
-                    },
-                });
-                let data = await response.json();
-                return data; // n eh results aqui
-            }catch(error){
-                console.log(error);
-            }
-        }
-        const exs = favorites.map((exerciseId) => fetchExercise(exerciseId));
-        Promise.all(exs).then((exercises) => {
-            setFavoriteExercises(exercises);
-            setFavoriteLoading(false);
-            console.log("carregou favoritos:", exercises); // Verifica o que está sendo salvo
-        });
-    }, [favorites]);
 
     const calculatePercentage = (value, goal) => Math.min((value / goal) * 100, 100);
 
     return (
         <div className="App">
             <Routes>
-                {/* Página inicial */}
+                {/* Home Page */}
                 <Route
                     path="/"
                     element={
                         <div className="home-page">
-                            <img src="/images/logo.png" alt="Home" className="home-logo" />
+                            <div className="app-header">
+                                <img src="/images/logo.png" alt="Home" className="home-logo" />
+                                <h1 className="app-title">CrossPão</h1>
+                            </div>
+                            
+                            <div className="health-summary">
+                                <div className="health-metric">
+                                    <h3>Heart Rate</h3>
+                                    <div className="metric-value">
+                                        {metrics.heartRate} <span className="metric-unit">bpm</span>
+                                    </div>
+                                </div>
+                                <div className="health-metric">
+                                    <h3>Sleep</h3>
+                                    <div className="metric-value">
+                                        {metrics.sleep} <span className="metric-unit">hrs</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div className="tracker-container">
-                                <div className="circular-progress" style={{ background: `conic-gradient(#4caf50 ${calculatePercentage(metrics.steps, goals.steps)}%, #e0e0e0 0)` }}>
+                                <div className="circular-progress" style={{ background: `conic-gradient(#00a0e9 ${calculatePercentage(metrics.steps, goals.steps)}%, #e8f5ff 0)` }}>
                                     <p className="step-count">{metrics.steps}</p>
                                     <p className="step-label">Steps</p>
                                 </div>
-                                <div className="circular-progress" style={{ background: `conic-gradient(#ff9800 ${calculatePercentage(metrics.calories, goals.calories)}%, #e0e0e0 0)` }}>
+                                <div className="circular-progress" style={{ background: `conic-gradient(#ff6b81 ${calculatePercentage(metrics.calories, goals.calories)}%, #ffecef 0)` }}>
                                     <p className="step-count">{metrics.calories}</p>
                                     <p className="step-label">Calories</p>
                                 </div>
-                                <div className="circular-progress" style={{ background: `conic-gradient(#2196f3 ${calculatePercentage(metrics.activeTime, goals.activeTime)}%, #e0e0e0 0)` }}>
+                                <div className="circular-progress" style={{ background: `conic-gradient(#7dcd40 ${calculatePercentage(metrics.activeTime, goals.activeTime)}%, #f0f9e8 0)` }}>
                                     <p className="step-count">{metrics.activeTime} min</p>
                                     <p className="step-label">Active Time</p>
                                 </div>
                             </div>
-                            <div className="button-container">
-                                <Link to="/exercises" className="action-button">
-                                    Start Exercising
+                            
+                            <div className="action-grid">
+                                <Link to="/exercises" className="action-card exercise">
+                                    <i className="icon">🏃‍♂️</i>
+                                    <span>Exercise</span>
                                 </Link>
-                                <Link to="/nutrition" className="action-button">
-                                    Go to Nutrition
+                                <Link to="/nutrition" className="action-card nutrition">
+                                    <i className="icon">🥗</i>
+                                    <span>Nutrition</span>
                                 </Link>
-                            </div>
-                            <div className="customize-container">
-                                <Link to="/customize" className="customize-button">
-                                    Customize my profile
+                                <Link to="/favorites" className="action-card favorites">
+                                    <i className="icon">❤️</i>
+                                    <span>Favorites</span>
                                 </Link>
-                            </div>
-
-                            {/* aqui vai ir o treino atual */}
-                            <div>
-
-                            </div>
-
-                            {/* aqui vai ir os treinos favoritados */}
-                            <h2>Favorite Exercises</h2>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', padding: '16px' }}>
-                                {
-                                    favoriteExercises.map((exercise) => (
-                                        <ExerciseCard key={exercise.id}
-                                            exercise={exercise}
-                                            onFavoriteToggle={(id) => {
-                                                const newFavorites = favorites.includes(id) ? favorites.filter((favId) => favId !== id) : [...favorites, id];
-                                                setFavorites(newFavorites);
-                                                localStorage.setItem('favorites', JSON.stringify(newFavorites));
-                                            }}
-                                            isFavorite={favorites.includes(exercise.id)} />
-                                    ))
-                                    
-                                }
+                                <Link to="/customize" className="action-card customize">
+                                    <i className="icon">⚙️</i>
+                                    <span>Settings</span>
+                                </Link>
                             </div>
                         </div>
                     }
                 />
-                {/* Página de Exercícios */}
+                
+                {/* Exercise Page */}
                 <Route
                     path="/exercises"
                     element={
                         <div className="exercise-page">
-                            <Link to="/" className="logo-link">
-                                <img src="/images/logo.png" alt="Home" className="logo" />
-                            </Link>
+                            <div className="page-header">
+                                <Link to="/" className="back-button">
+                                    <i className="icon">←</i>
+                                </Link>
+                                <h2>Exercises</h2>
+                            </div>
                             <ExercisePage2 />
                         </div>
                     }
                 />
-                {/* Página de Nutrição */}
-                <Route path="/nutrition" element={<NutritionPage />} />
-                {/* Página de Customização */}
-                <Route path="/customize" element={<CustomizePage />} />
+                
+                {/* Nutrition Page */}
+                <Route 
+                    path="/nutrition" 
+                    element={
+                        <div className="nutrition-page">
+                            <div className="page-header">
+                                <Link to="/" className="back-button">
+                                    <i className="icon">←</i>
+                                </Link>
+                                <h2>Nutrition</h2>
+                            </div>
+                            <NutritionPage />
+                        </div>
+                    } 
+                />
+                
+                {/* Customization Page */}
+                <Route 
+                    path="/customize" 
+                    element={
+                        <div className="customize-page">
+                            <div className="page-header">
+                                <Link to="/" className="back-button">
+                                    <i className="icon">←</i>
+                                </Link>
+                                <h2>Settings</h2>
+                            </div>
+                            <CustomizePage />
+                        </div>
+                    } 
+                />
+                
+                {/* Favorites Page */}
+                <Route 
+                    path="/favorites" 
+                    element={
+                        <div className="favorites-page">
+                            <div className="page-header">
+                                <Link to="/" className="back-button">
+                                    <i className="icon">←</i>
+                                </Link>
+                                <h2>Favorites</h2>
+                            </div>
+                            <FavoritesPage />
+                        </div>
+                    } 
+                />
             </Routes>
         </div>
     );
