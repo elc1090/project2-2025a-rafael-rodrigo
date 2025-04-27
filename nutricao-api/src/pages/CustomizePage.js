@@ -16,7 +16,6 @@ function CustomizePage() {
 
   const handleSave = () => {
     alert('Profile updated successfully!');
-    // Aqui você pode adicionar lógica para salvar os dados no backend
   };
 
   return (

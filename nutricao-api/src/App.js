@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import ExercisePage from './pages/ExercisePage';
-import ExercisePage2 from './pages/ExercisePage2';
+import ExercisePage2 from './pages/ExercisePage2'; // Ensure ExercisePage2 supports infinite scrolling
 import NutritionPage from './pages/NutritionPage';
 import CustomizePage from './pages/CustomizePage'; // Import da nova página
 import ExerciseCard from './pages/ExerciseCard';
@@ -131,7 +131,17 @@ function App() {
                     }
                 />
                 {/* Página de Exercícios */}
-                <Route path="/exercises" element={<ExercisePage2 />} />
+                <Route
+                    path="/exercises"
+                    element={
+                        <div className="exercise-page">
+                            <Link to="/" className="logo-link">
+                                <img src="/images/logo.png" alt="Home" className="logo" />
+                            </Link>
+                            <ExercisePage2 />
+                        </div>
+                    }
+                />
                 {/* Página de Nutrição */}
                 <Route path="/nutrition" element={<NutritionPage />} />
                 {/* Página de Customização */}
