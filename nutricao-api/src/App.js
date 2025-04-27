@@ -5,6 +5,7 @@ import ExercisePage2 from './pages/ExercisePage2';
 import NutritionPage from './pages/NutritionPage';
 import CustomizePage from './pages/CustomizePage';
 import FavoritesPage from './pages/FavoritesPage';
+import ExerciseDetailsPage from './pages/ExerciseDetailsPage'; // Import the new ExerciseDetailsPage
 
 function App() {
     const [metrics, setMetrics] = useState({
@@ -24,11 +25,12 @@ function App() {
     };
 
     useEffect(() => {
-        // Generate random values for simulation
+        // Generate random values for simulation and load active time from localStorage
+        const storedMetrics = JSON.parse(localStorage.getItem("metrics")) || { activeTime: 0 };
         const randomMetrics = {
             steps: Math.floor(Math.random() * goals.steps),
             calories: Math.floor(Math.random() * goals.calories),
-            activeTime: Math.floor(Math.random() * goals.activeTime),
+            activeTime: storedMetrics.activeTime, // Load active time
             heartRate: Math.floor(Math.random() * 40) + 60,
             sleep: (Math.random() * 3 + 5).toFixed(1),
         };
@@ -110,6 +112,12 @@ function App() {
                             <ExercisePage2 />
                         </div>
                     }
+                />
+                
+                {/* Exercise Details Page */}
+                <Route 
+                    path="/exercise/:id" 
+                    element={<ExerciseDetailsPage />} 
                 />
                 
                 {/* Nutrition Page */}

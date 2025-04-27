@@ -186,6 +186,19 @@
   padding: 5px;
 }
 
+a {
+  color: inherit; /* Use the current text color */
+  text-decoration: none; /* Remove underline */
+}
+
+a:visited {
+  color: inherit; /* Ensure visited links have the same color */
+}
+
+a:hover {
+  text-decoration: underline; /* Optional: Add underline on hover */
+}
+
 .exercise-list {
   display: flex;
   flex-wrap: wrap;

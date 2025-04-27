@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import ExerciseCard from "./ExerciseCard";
 import './ExercisePage2.css';
 
@@ -13,6 +14,7 @@ function ExercisePage2() {
     const [nextExercisesLink, setNextExercisesLink] = useState('https://wger.de/api/v2/exerciseinfo/');
     const [favorites, setFavorites] = useState([]);
     const [activeFilters, setActiveFilters] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
@@ -94,9 +96,9 @@ function ExercisePage2() {
         const handleScroll = () => {
             if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 100 && !loading) {
                 if (activeFilters) {
-                    fetchExercises(false, false, 5); // Load at least 5 exercises when filtered
+                    fetchExercises(false, false, 10);
                 } else {
-                    fetchExercises();
+                    fetchExercises(true, false, 20); 
                 }
             }
         };
@@ -104,6 +106,7 @@ function ExercisePage2() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, [loading, nextExercisesLink, activeFilters]);
+    
 
     const handleFilterChange = (filterType, value) => {
         if (filterType === "language") setLanguageFilter(value);
@@ -113,7 +116,8 @@ function ExercisePage2() {
         const hasFilters = value || 
             (filterType === "language" ? categoryFilter || equipmentFilter : 
              filterType === "category" ? languageFilter || equipmentFilter : 
-             languageFilter || categoryFilter);
+             filterType === "equipment" ? languageFilter || categoryFilter :
+             languageFilter || categoryFilter || equipmentFilter);
         
         setActiveFilters(!!hasFilters);
         
@@ -200,18 +204,19 @@ function ExercisePage2() {
             ) : (
                 <div className="exercises-grid">
                     {filteredExercises.map((exercise) => (
-                        <ExerciseCard
-                            key={exercise.id}
-                            exercise={exercise}
-                            onFavoriteToggle={(id) => {
-                                const updatedFavorites = favorites.includes(id)
-                                    ? favorites.filter((favId) => favId !== id)
-                                    : [...favorites, id];
-                                setFavorites(updatedFavorites);
-                                localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-                            }}
-                            isFavorite={favorites.includes(exercise.id)}
-                        />
+                        <Link to={`/exercise/${exercise.id}`} key={exercise.id} style={{ textDecoration: 'none' }}>
+                            <ExerciseCard
+                                exercise={exercise}
+                                onFavoriteToggle={(id) => {
+                                    const updatedFavorites = favorites.includes(id)
+                                        ? favorites.filter((favId) => favId !== id)
+                                        : [...favorites, id];
+                                    setFavorites(updatedFavorites);
+                                    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+                                }}
+                                isFavorite={favorites.includes(exercise.id)}
+                            />
+                        </Link>
                     ))}
                     {loading && Array.from({ length: activeFilters ? 5 : 3 }).map((_, index) => (
                         <div key={`loading-${index}`} className="exercise-card loading-placeholder">
