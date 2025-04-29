@@ -34,6 +34,7 @@ O início do projeto foi baseado em um site para ser utilizado tanto no _desktop
 
 * Github copilot
 * Deepseek e ChatGPT - para exemplos e dúvidas sobre React
+* Documentação da API WGER
 
 ---
 
