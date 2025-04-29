@@ -73,26 +73,31 @@
 }
 
 .no-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: 40px 20px;
-    color: #666;
+    font-size: 18px;
+    color: #555;
+    margin: 0 auto; /* Center horizontally */
+    height: 50vh; /* Center vertically within the page */
+    width: 100%; /* Ensure it spans the full width */
 }
 
 .clear-filters-button {
+    margin-top: 15px;
     padding: 10px 20px;
-    background-color: #00a0e9;
+    background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
-    margin-top: 15px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    font-size: 16px;
 }
 
 .clear-filters-button:hover {
-    background-color: #0077c8;
+    background-color: #0056b3;
 }
 
 .loading-placeholder {
@@ -146,4 +151,20 @@
     .exercises-grid {
         grid-template-columns: 1fr;
     }
+}
+
+.back-button {
+    background: #00a0e9;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-right: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
