@@ -6,7 +6,11 @@ function NutritionPage() {
     const [foods, setFoods] = useState([]);
     const [nutritionPlans, setNutritionPlans] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(() => {
+        const today = new Date();
+        today.setMinutes(today.getMinutes() - today.getTimezoneOffset()); // Adjust for timezone offset
+        return today.toISOString().split('T')[0];
+    });
     const [activeTab, setActiveTab] = useState('today');
     const [newMeal, setNewMeal] = useState({
         name: '',
@@ -190,7 +194,7 @@ function NutritionPage() {
             {activeTab === 'today' && (
                 <div className="today-nutrition">
                     <div className="nutrition-summary-card">
-                        <h3>Daily Summary - {new Date(selectedDate).toLocaleDateString()}</h3>
+                        <h3>Daily Summary - {new Date(selectedDate + 'T00:00:00').toLocaleDateString()}</h3>
                         <div className="nutrition-macros">
                             <div className="macro-item">
                                 <div className="macro-value">{dailyNutrition.calories.toFixed(0)}</div>
@@ -285,12 +289,12 @@ function NutritionPage() {
                     </div>
 
                     <div className="meals-container">
-                <h3>Meals for {new Date(selectedDate).toLocaleDateString()}</h3>
+                <h3>Meals for {new Date(selectedDate + 'T00:00:00').toLocaleDateString()}</h3>
                 {meals.length > 0 ? (
                     meals.map(meal => (
                         <div key={meal.id} className="meal-card">
                             <div className="meal-header">
-                                <h4>{meal.name}</h4>
+                                <h4>{meal.name}</h4>    
                                 <div>
                                     <span className="meal-time">{meal.time}</span>
                                     <button 
