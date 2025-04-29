@@ -14,6 +14,8 @@ A plataforma desenvolvida (CrossPão) é um centralizador de diversas atividades
 
 ## Desenvolvimento
 
+O início do projeto foi baseado em um site para ser utilizado tanto no _desktop_ quanto no _mobile_, com uma ideia semelhante a aplicativos de monitoramento físico e nutricional, como Samsung Health. Desse modo, incluímos algumas funcionalidades que tinhamos acesso na API, mas também que são úteis em _softwares_ dessa alçada. As páginas foram criadas de forma simplificada, para facilitar a usabilidade e clareza das informações.
+
 ## Tecnologias
 
 * Create React App
@@ -31,6 +33,7 @@ A plataforma desenvolvida (CrossPão) é um centralizador de diversas atividades
 ## Referências e Créditos
 
 * Github copilot
+* Deepseek e ChatGPT - para exemplos e dúvidas sobre React
 
 ---
 
