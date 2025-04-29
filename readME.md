@@ -10,6 +10,8 @@ Rafael Carneiro Pregardier e Rodrigo Appelt
 
 ## Nosso produto
 
+A plataforma desenvolvida (CrossPão) é um centralizador de diversas atividades voltadas para a saúde, com o foco em exercícios e dicas de nutrição. Conta com _features_ de listar e favoritar exercícios, timer para suas atividades e personalização do seu perfil!
+
 ## Desenvolvimento
 
 ## Tecnologias
